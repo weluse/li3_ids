@@ -1,0 +1,24 @@
+# Lithium Intrusion Detection System Library (li3_ids)
+
+The li3_ids is a port of the phpids Library from phpids.org.
+
+## Setup
+Simply embed the library into your Library folder and add it in your bootstrap process.
+(e.G.: app/config/bootstrap/libraries.php):
+
+{{{
+Library::add('li3_ids');
+}}}
+then make sure, that you give write access to the ids tmp path. which is
+{{{li3_ids/libraries/phpids/lib/IDS/tmp}}}
+We will change this folder settings into li3 alike in one of our next releases.
+
+##Info
+Currently, it just supports logging into your resources folder.
+look into:
+{{{
+app/resources/tmp/warning.log
+}}}
+
+more Features will follow soon.
+Ideas: Database Logging, MailService, ImpactLevel mapping to Log-Levels
