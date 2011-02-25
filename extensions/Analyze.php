@@ -1,12 +1,17 @@
 <?php
-/* 
+/**
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 
 namespace li3_ids\extensions;
 
-Class Analyze extends \lithium\core\Adaptable {
+/**
+ *
+ *
+ *
+ */
+class Analyze extends \lithium\core\Adaptable {
 
 	/**
 	 * Classes used by `Analyze`.
@@ -19,7 +24,7 @@ Class Analyze extends \lithium\core\Adaptable {
 		'request' => 'lithium\action\Request',
 		'logger' => 'lithium\analysis\Logger',
 	);
-	
+
 	/**
 	 * Placeholder for the Request Object
 	 *
@@ -27,6 +32,12 @@ Class Analyze extends \lithium\core\Adaptable {
 	 */
 	protected static $_requestInstance = NULL;
 
+	/**
+	 * Runs the Analyzer
+	 *
+	 * @param array $params
+	 * @return true
+	 */
 	public static function run($params){
 		//die(print_r(\func_get_args(),true));
 
@@ -45,18 +56,18 @@ Class Analyze extends \lithium\core\Adaptable {
 			//awful code structure is following... :(
 
 			//fetch settings from init/config
-			$idsPath = \dirname(__FILE__).'/../libraries/'. 'phpids/lib';
+			$idsPath = \dirname(__FILE__) . '/../libraries/' . 'phpids/lib';
 
 			if(!$path = \realpath($idsPath)){
-				die('Path to IDS lib does not exists: '.$idsPath);
+				die('Path to IDS lib does not exists: ' . $idsPath);
 			}else{
 				$idsPath = $path;
 			}
 
 			set_include_path($idsPath);
 			require_once 'IDS/Init.php';
-			$init = \IDS_Init::init($idsPath.'/IDS/Config/Config.ini.php');
-			$init->config['General']['base_path'] = $idsPath.'/IDS/';
+			$init = \IDS_Init::init($idsPath . '/IDS/Config/Config.ini.php');
+			$init->config['General']['base_path'] = $idsPath . '/IDS/';
 			$init->config['General']['use_base_path'] = True;
 
 
@@ -75,17 +86,24 @@ Class Analyze extends \lithium\core\Adaptable {
 		return True;
 	}
 
+	/**
+	 * React
+	 *
+	 * @param object $result \IDS_Report
+	 * @return	void
+	 */
 	protected static function react(\IDS_Report $result){
 		$currentImpact = $result->getImpact();
 		$config = self::config('default');
 
 		//@todo get from session!
 		$impact = $currentImpact;
-		switch (TRUE){			
+		switch(TRUE) {
 			case $impact >= $config['threshold']['kick']:
 				//IP to Blacklist
 				self::log($result,'kick',$impact);
-				//die('Ihre IP wurde gesperrt! Total impact:'.$impact.' vs '.$config['threshold']['kick']);
+				//die('Ihre IP wurde gesperrt!
+				//Total impact:'.$impact.' vs '.$config['threshold']['kick']);
 				break;
 			case $impact >= $config['threshold']['warn']:
 				//warn
@@ -106,8 +124,9 @@ Class Analyze extends \lithium\core\Adaptable {
 	}
 
 	/**
+	 * Logs an IDS_Report
 	 *
-	 * @param \IDS_Report $result
+	 * @param object $result \IDS_Report
 	 * @param string $threshold
 	 * @param integer $totalImpact
 	 * @return boolean
@@ -128,9 +147,9 @@ Class Analyze extends \lithium\core\Adaptable {
 			$threshold = $config['threshold'][$params['threshold']];
 			$ip = $request->env('REMOTE_ADDR');
 
-			$msg =$ip.' Total Impact: ' . $totalImpact .
-				' is raised by: ' . $result->getImpact() .
-				' and higher than threshold: ' . $threshold;
+			$msg = $ip . ' Total Impact: ' . $totalImpact
+			 . ' is raised by: ' . $result->getImpact()
+			 . ' and higher than threshold: ' . $threshold;
 
 			$_classes['logger']::write('warning',$msg,array('name'=>'ids'));
 		});

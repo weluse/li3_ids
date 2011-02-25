@@ -17,4 +17,5 @@ Dispatcher::applyFilter('run', function($self, $params, $chain) {
 	Analyze::run($params);
 	return $chain->next($self, $params, $chain);
 });
- ?>
+
+?>
