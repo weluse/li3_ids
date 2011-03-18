@@ -6,6 +6,8 @@
 
 namespace li3_ids\extensions;
 
+use lithium\storage\Session;
+
 /**
  *
  *
@@ -78,7 +80,7 @@ class Analyze extends \lithium\core\Adaptable {
 			set_include_path($path);
 
 			if($result instanceof \IDS_Report){
-				self::react($result);
+			 static::react($result);
 			}
 		} catch (Exception $e){
 			die($e->getMessage());
@@ -93,29 +95,33 @@ class Analyze extends \lithium\core\Adaptable {
 	 * @return	void
 	 */
 	protected static function react(\IDS_Report $result){
+
 		$currentImpact = $result->getImpact();
 		$config = self::config('default');
-
-		//@todo get from session!
-		$impact = $currentImpact;
+		
+		$impact = Session::read('impact',array('name'=>'ids'));
+		$impact += $currentImpact;
+		if(!Session::write('impact', (string)$impact, array('name' => 'ids'))){
+			throw new \Exception('Session write not possible!');
+		}
 		switch(TRUE) {
 			case $impact >= $config['threshold']['kick']:
 				//IP to Blacklist
-				self::log($result,'kick',$impact);
+				static::log($result,'kick',$impact);
 				//die('Ihre IP wurde gesperrt!
 				//Total impact:'.$impact.' vs '.$config['threshold']['kick']);
 				break;
 			case $impact >= $config['threshold']['warn']:
 				//warn
-				self::log($result,'warn',$impact);
+				static::log($result,'warn',$impact);
 				break;
 			case $impact >= $config['threshold']['mail']:
 				//mail
-				self::log($result,'mail',$impact);
+				static::log($result,'mail',$impact);
 				break;
 			case $impact >= $config['threshold']['log']:
 				//log this
-				self::log($result,'log',$impact);
+				static::log($result,'log',$impact);
 				break;
 			default:
 				//nothing
