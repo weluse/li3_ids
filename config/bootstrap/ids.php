@@ -4,7 +4,12 @@
 use li3_ids\extensions\Analyze;
 use lithium\analysis\Logger;
 
+use lithium\storage\Session;
+use lithium\storage\session\adapter\Php;
 
+Session::config(array(
+	'ids' => array('adapter' => new Php, 'filters' => array()),
+));
 //@todo build a threshhold-Level Logger-Level Mapper
 
 Analyze::config(array(
